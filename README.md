@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm ci && npm run build
-      - uses: blogcastAI/a11y-gate-action@v0.1.0
+      - uses: blogcastAI/a11y-gate-action@v0.1.1
         with:
           serve-dir: dist
           pages: |
@@ -46,7 +46,7 @@ Scan an already-running server:
 
 ```yaml
       - run: npm run dev &
-      - uses: blogcastAI/a11y-gate-action@v0.1.0
+      - uses: blogcastAI/a11y-gate-action@v0.1.1
         with:
           url: http://localhost:3000
           pages: "/ /signup /settings"
