@@ -1,8 +1,7 @@
 name: "a11y-gate"
 description: >-
-  Run axe-core WCAG 2.1 A/AA scans across four viewports (320px-4K) against a
-  URL or a static directory. Blocks a class of accessibility regressions;
-  makes no conformance or compliance claims.
+  axe-core WCAG 2.1 A/AA scans at 4 viewports (320px-4K) on a URL or static
+  dir. Blocks regressions; not a compliance claim.
 author: "Blogcast, Inc."
 branding:
   icon: "eye"
