@@ -1,0 +1,94 @@
+name: "a11y-gate"
+description: >-
+  Run axe-core WCAG 2.1 A/AA scans across four viewports (320px-4K) against a
+  URL or a static directory. Blocks a class of accessibility regressions;
+  makes no conformance or compliance claims.
+author: "Blogcast, Inc."
+branding:
+  icon: "eye"
+  color: "purple"
+
+inputs:
+  url:
+    description: >-
+      Base URL of an already-running site to scan (e.g. http://localhost:3000).
+      Mutually exclusive with serve-dir.
+    required: false
+    default: ""
+  serve-dir:
+    description: >-
+      Static directory to serve and scan (the action starts its own server).
+      Mutually exclusive with url.
+    required: false
+    default: ""
+  port:
+    description: "Port for the built-in static server when serve-dir is used."
+    required: false
+    default: "8901"
+  pages:
+    description: >-
+      Space- or newline-separated list of paths to scan, relative to the base
+      URL (e.g. "/ /pricing /signup"). Default scans "/" only.
+    required: false
+    default: "/"
+  viewports:
+    description: >-
+      Space- or newline-separated viewport list as WIDTHxHEIGHT. Default is
+      the four-viewport battery: reflow failures appear only at 320px,
+      density/spacing failures only at 4K.
+    required: false
+    default: "320x568 768x1024 1280x800 3840x2160"
+  fail-on:
+    description: >-
+      Minimum axe impact level that fails the gate: minor, moderate, serious,
+      or critical. Violations below the threshold are reported but do not
+      fail. Default: serious.
+    required: false
+    default: "serious"
+  exclude:
+    description: >-
+      Space- or newline-separated CSS selectors excluded from the scan
+      subtree (e.g. third-party iframes: "iframe[src*='youtube']"). Use for
+      content you cannot fix from this repo — never to silence your own
+      components.
+    required: false
+    default: ""
+
+outputs:
+  total-violations:
+    description: "Total axe violations found across all pages and viewports (deduplicated per page+viewport+rule)."
+    value: ${{ steps.scan.outputs.total-violations }}
+  failing-violations:
+    description: "Violations at or above the fail-on impact threshold."
+    value: ${{ steps.scan.outputs.failing-violations }}
+  report-path:
+    description: "Path to the JSON report artifact written by the scan."
+    value: ${{ steps.scan.outputs.report-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install scanner dependencies
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci --no-audit --no-fund
+
+    - name: Install Playwright Chromium
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npx playwright install --with-deps chromium
+
+    - name: Run axe scans (4-viewport battery)
+      id: scan
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        A11Y_URL: ${{ inputs.url }}
+        A11Y_SERVE_DIR: ${{ inputs.serve-dir }}
+        A11Y_PORT: ${{ inputs.port }}
+        A11Y_PAGES: ${{ inputs.pages }}
+        A11Y_VIEWPORTS: ${{ inputs.viewports }}
+        A11Y_FAIL_ON: ${{ inputs.fail-on }}
+        A11Y_EXCLUDE: ${{ inputs.exclude }}
+        A11Y_WORKSPACE: ${{ github.workspace }}
+      run: node scan.mjs

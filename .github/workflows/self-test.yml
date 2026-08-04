@@ -1,0 +1,50 @@
+# Self-test: run the action against a known-clean page (must pass) and a
+# known-violating page (must fail). Proves both directions of the gate on
+# every change to the action itself.
+name: self-test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  clean-page-passes:
+    name: clean fixture passes
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the action against the clean fixture
+        uses: ./
+        with:
+          serve-dir: fixtures/clean
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-clean
+          path: a11y-gate-report.json
+
+  violating-page-fails:
+    name: violating fixture fails (inverted)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the action against the violating fixture (expect failure)
+        id: gate
+        continue-on-error: true
+        uses: ./
+        with:
+          serve-dir: fixtures/violating
+      - name: Assert the gate failed
+        run: |
+          if [ "${{ steps.gate.outcome }}" != "failure" ]; then
+            echo "::error::the gate passed a page with known violations"
+            exit 1
+          fi
+          echo "gate correctly failed: ${{ steps.gate.outputs.failing-violations }} failing violation(s)"

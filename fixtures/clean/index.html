@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo page — a11y-gate-template</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #1a1a1a;
+    --bg: #ffffff;
+    --accent: #0b57d0;
+    --accent-fg: #ffffff;
+    --border: #6b6b6b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #ececec;
+      --bg: #121212;
+      --accent: #8ab4f8;
+      --accent-fg: #0f1a2b;
+      --border: #9a9a9a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.5;
+  }
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--accent);
+    color: var(--accent-fg);
+    padding: 0.5rem 1rem;
+  }
+  .skip-link:focus {
+    left: 0;
+    z-index: 10;
+  }
+  header, main, footer {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  /* Content must reflow, not overflow, at 320px (WCAG 1.4.10). */
+  img, video, iframe { max-width: 100%; height: auto; }
+  a { color: var(--accent); }
+  button {
+    font: inherit;
+    color: var(--accent-fg);
+    background: var(--accent);
+    border: 2px solid transparent;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+  /* A focus indicator that is never removed — only enhanced. */
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+  label { display: block; margin-top: 1rem; font-weight: 600; }
+  input[type="email"] {
+    display: block;
+    width: 100%;
+    max-width: 20rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--fg);
+  }
+  [role="status"] { min-height: 1.5rem; display: block; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header>
+  <nav aria-label="Primary">
+    <a href="#main">Home</a>
+  </nav>
+</header>
+<main id="main">
+  <h1>Accessibility gate demo page</h1>
+  <p>
+    This page exists so the template's own CI has something real to scan:
+    a heading, a labelled form, a live region, and a button — the minimum
+    surface where axe rules and keyboard checks both have teeth.
+  </p>
+
+  <h2>Sign up for updates</h2>
+  <form id="signup">
+    <label for="email">Email address</label>
+    <input id="email" name="email" type="email" autocomplete="email"
+           aria-describedby="email-hint" required>
+    <p id="email-hint">We only use this to send the newsletter.</p>
+    <button type="submit">Subscribe</button>
+    <span role="status" id="form-status"></span>
+  </form>
+
+  <script>
+    // Progressive enhancement: the status region announces the result
+    // politely instead of navigating away.
+    document.getElementById("signup").addEventListener("submit", (e) => {
+      e.preventDefault();
+      document.getElementById("form-status").textContent =
+        "Thanks — you are subscribed.";
+    });
+  </script>
+</main>
+<footer>
+  <p>Template demo page. No tracking, no external requests.</p>
+</footer>
+</body>
+</html>

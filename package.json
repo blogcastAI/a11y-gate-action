@@ -1,0 +1,12 @@
+{
+  "name": "a11y-gate-action",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Composite GitHub Action: axe-core WCAG 2.1 A/AA scans at four viewports (320px-4K) against a URL or static directory",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "axe-core": "^4.12.1",
+    "playwright": "^1.62.1"
+  }
+}
